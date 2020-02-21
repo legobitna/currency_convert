@@ -1,40 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
+
     <title>Document</title>
-    
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <h1>Currency Convert!</h1>
-    <h2>from currency</h2>
-    
-        <input type="radio" name="Fromcurrency" value="VND" checked>VND<br>
-        <input type="radio" name="Fromcurrency" value="USD">USD<br>
-        <input type="radio" name="Fromcurrency" value="KRW">KRW
-    
-    <h2>to currency </h2>
-    <select id="toCurrency">
-        <option value="VND">VND</option>
-        <option value="USD">USD</option>
-        <option value="KRW">KRW</option>
-    </select>
-   </br>
-    <input type="text" id="money"/>
-    <button id="exchange">exchange</button>
-    <p id="resultArea" style="display:none;">here is the result </p>
+    <div class="container">
+        <div class="convert-area">
+            <div class="convert-section">
+            <div>
+                <h2>Amount</h2>
+                <input type="number" id="money" />
+            </div>
+            <div>
+                <h2>from currency</h2>
+
+                <input type="radio" name="Fromcurrency" value="VND" checked>VND<br>
+                <input type="radio" name="Fromcurrency" value="USD" >USD<br>
+                <input type="radio" name="Fromcurrency" value="KRW" >KRW
+            </div>
+
+            <div>
+                <h2>to currency </h2>
+                <select id="toCurrency">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="KRW">KRW</option>
+                </select>
+            </div>
+
+            <button id="exchange">></button>
+        </div>
+
+           
+            <p id="resultArea" style="display:none;">here is the result </p>
+        </div> 
+
+    </div>
     <span id="result"></span>
-     <br>
-    <input type="Text" id="amount"/>
+    <br>
+    <div style="text-align: center;">
+    <input type="Text" id="amount" />
     <button id="coinButton">show me coin</button>
     <ul id="coinResult"></ul>
+</div>
 
-    <h1>Currency Board</h1>
-    <p id=currencyBoard></p>
 
     <script src="main.js"></script>
 </body>
+
 </html>

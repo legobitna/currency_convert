@@ -17,7 +17,6 @@ const KRW = {
 };
 
 const currencies = { VND, USD, KRW };
-let realcur ; // 실시간 환율저장 
 
 function convertMoney() {
   let selectedFrom = document.querySelector(
@@ -26,117 +25,111 @@ function convertMoney() {
   let selector = document.getElementById("toCurrency"); // 리스트에서 환율가져오기
   let selectedTo = selector[selector.selectedIndex].value;
   let money = document.getElementById("money").value; // 금액 가져오기
-//   let resultAmount = money * getCurrency(selectedFrom, selectedTo); //고정환율로 계산하는것
- 
-//   if (selectedTo == "USD") {
-//     // 소수점 반올림
-//     resultAmount = resultAmount.toFixed(2);
-//   } else {
-//     resultAmount = resultAmount.toFixed(0);
-//   }
-//   let result = document.getElementById("result"); //결과 보여주기
-//   result.innerHTML = `${formatNumber(
-//     money
-//   )} ${selectedFrom} is same amount with ${formatNumber(
-//     resultAmount
-//   )} ${selectedTo}`;
 
-//   let resultArea = document.getElementById("resultArea"); //숨겨둔 라인 보여주기
-//   resultArea.style.display = "block";
-convertMoney(selectedFrom,selectedTo,money)//실시간환율로 계산 
-}
+  //   let resultAmount = money * getCurrency(selectedFrom, selectedTo); //고정환율로 계산하는것
 
-function getCurrency(from, to) { //고정환율계산 
-  return currencies[from][to];
-  
-}
-function convertMoney(from,to,money){
-  let str=from+'_'+to;
-  callApi(str);
-  let result = document.getElementById("result");
-  let resultArea = document.getElementById("resultArea"); //숨겨둔 라인 보여주기
-  resultArea.style.display = "block";
-  let resultAmount=money*realcur;
-  console.log("resultamount",resultAmount);
-  if (to == "USD") {
-    // 소수점 반올림
-    resultAmount = resultAmount.toFixed(2);
-  } else {
-    resultAmount = resultAmount.toFixed(0);
-  }
- 
-  result.innerHTML = `${formatNumber(
-    money
-  )} ${selectedFrom} is same amount with ${formatNumber(
-    resultAmount
-  )} ${selectedTo}`;
-  
+  //   if (selectedTo == "USD") {
+  //     // 소수점 반올림
+  //     resultAmount = resultAmount.toFixed(2);
+  //   } else {
+  //     resultAmount = resultAmount.toFixed(0);
+  //   }
+  //   let result = document.getElementById("result"); //결과 보여주기
+  //   result.innerHTML = `${formatNumber(
+  //     money
+  //   )} ${selectedFrom} is same amount with ${formatNumber(
+  //     resultAmount
+  //   )} ${selectedTo}`;
 
+  //   let resultArea = document.getElementById("resultArea"); //숨겨둔 라인 보여주기
+  //   resultArea.style.display = "block";
+
+  callApi(selectedFrom, selectedTo, money); //실시간환율로 계산
 }
 
 function formatNumber(num) {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 }
 
-const unit = [500000, 200000, 100000, 50000, 20000, 10000, 5000, 1000];
+const unit = [500000, 200000, 100000, 50000, 20000, 10000, 5000, 1000]; 
 
 function getCoin() {
   let amount = document.getElementById("amount").value;
   let coinAmount = [];
   for (i = 0; i < unit.length; i++) {
-    let currentCoin = unit[i];
-    let numberOfCoinsPossible = Math.floor(amount / currentCoin);
-    if (numberOfCoinsPossible > 0) {
-      amount = amount - numberOfCoinsPossible * currentCoin;
+    let currentNote = unit[i];
+    let denominationNote = Math.floor(amount / currentNote);
+    if (denominationNote > 0) {
+      amount = amount - denominationNote * currentNote;
     }
-    coinAmount[i] = numberOfCoinsPossible;
+    coinAmount[i] = denominationNote;
   }
   console.log("coin amount is", coinAmount);
   let coinResult = document.getElementById("coinResult");
-  let hi2 = "";
-//   for (i = 0; i < unit.length; i++) {
-//     hi += `<li>${unit[i]} * ${coinAmount[i]}</li>`;
-//   }
+  let denominationsHTML="";
+    for (i = 0; i < unit.length; i++) {
+      denominationsHTML += `<li>${unit[i]} * ${coinAmount[i]}</li>`;
+    }
 
-let hi=unit.map((_, i)=> {
-    return `<li>${unit[i]} * ${coinAmount[i]}</li>`; // map 을 이용해서 프린트하는 방법 
-})
-  coinResult.innerHTML = hi;
+  // let denominationsHTML = unit.map((_, i) => {
+  //   return `<li>${unit[i]} * ${coinAmount[i]}</li>`; // map 을 이용해서 프린트하는 방법
+  // });
+  coinResult.innerHTML = denominationsHTML;
 }
 
-async function callApi(currency) { //API 부르기
-    var xhr = new XMLHttpRequest();
-    let value;
-    await xhr.open('GET', `https://free.currencyconverterapi.com/api/v6/convert?q=${currency}&compact=y&apiKey=31afa7038ba9e6066b94`); // API키 가져오기 
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            updateResults(JSON.parse(xhr.responseText),currency);
-            let jsonObj=JSON.parse(xhr.responseText);
-            value=jsonObj[currency];
-           // updateResults(value)
 
-        }
-        else {
-            alert('Request failed.  Returned status of ' + xhr.status);
-        }
-    };
-   await xhr.send();
-    // 끝
-    
-  }
+async function callApi (from, to, amount){
+  let currency = from + "_" + to;
+  console.log(currency);
+  let url=`https://free.currencyconverterapi.com/api/v6/convert?q=${currency}&compact=y&apiKey=31afa7038ba9e6066b94`
+  let data = await fetch(url);
+  let jsonObj = await data.json();
+  
+  console.log(jsonObj[currency].val);
+
+  console.log(jsonObj[currency].val * amount )
+  let resultArea = document.getElementById("resultArea"); //숨겨둔 라인 보여주기
+  resultArea.style.display = "block";
+  resultArea.innerHTML = `${formatNumber(
+        amount
+      )} ${from} is same amount with ${formatNumber(
+        jsonObj[currency].val * amount
+      )} ${to}`;
 
 
-  function updateResults(response,currency) {
-    console.log(response);
-    let jsonObj=response
-    console.log(jsonObj[currency].val,"2222222222222")
-    realcur=jsonObj[currency].val;
-    console.log(realcur)
-    let board=document.getElementById("currencyBoard");
-    board.innerHTML=realcur
-  }
+
+} 
 
 
+// async function callApi(from, to, amount) {
+//   //API 부르기
+//   let currency = from + "_" + to;
+//   let url = `https://free.currencyconverterapi.com/api/v6/convert?q=${currency}&compact=y&apiKey=31afa7038ba9e6066b94`;
+
+//   let button = document.getElementById('exchange');
+//   button.disabled = true;
+//   let data = await fetch(url);
+//   let jsonObj = await data.json();
+//   button.disabled = false;
+
+//   let realTimeCur = jsonObj[currency].val; // 실시간 환율 json에서 값 읽어오기
+//   let resultAmount = amount * realTimeCur; //환전하기
+
+//   if (to == "USD") {
+//     // 소수점 반올림
+//     resultAmount = resultAmount.toFixed(2);
+//   } else {
+//     resultAmount = resultAmount.toFixed(0);
+//   }
+//   resultAmount = formatNumber(resultAmount); // , 붙이기
+//   let result = document.getElementById("result"); // HTML에 보여주기
+//   result.innerHTML = `${formatNumber(
+//     amount
+//   )} ${from} is same amount with ${resultAmount} ${to}`;
+
+//   let resultArea = document.getElementById("resultArea"); //숨겨둔 라인 보여주기
+//   resultArea.style.display = "block";
+// }
 
 // 버튼에 이벤트 추가하기
 let button = document.getElementById("exchange");
@@ -144,4 +137,3 @@ button.addEventListener("click", convertMoney);
 
 let coinButton = document.getElementById("coinButton");
 coinButton.addEventListener("click", getCoin);
-
